@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>IE Canvas line test</title>
+	<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+	    <script type="text/javascript">
+    
+	  var canvas, ctx;
+	  function drawLines(){
+        // get the canvas element using the DOM
+        var canvas = document.getElementById("area");
+		//set canvas area
+		//canvas.style.height = document.body.clientHeight;
+		//canvas.style.width = document.body.clientWidth;
+	
+		//cater for variance
+		var xoffset=-12;
+		var yoffset=7;
+		//get all links
+      	var links = document.getElementById("linklines").getElementsByTagName("a");
+		var linksLength = links.length;
+		//temporary element reference
+		var elementRef;
+		//store region code
+		var regionCode="";
+		
+		//track existing links
+		var foundMaster = false;
+		var foundRegion = false;
+		//use for modulus of line colour
+		var existingLinkNo = 0;
+		
+		//rgb alpha stroke colour
+		var strokeColour1 = "rgba(0,0,255,1)";
+		var strokeColour2 = "rgba(0,0,255,0.1)";
+		//set up line to references
+		var lineToX = 0;
+		var lineToY = 0;
+		
+		// use getContext to use the canvas for drawing
+        var ctx = canvas.getContext("2d");
+		// set transparency value (workaround for dodgey alpha in FF)
+  		//if(!document.all) ctx.globalAlpha = 0.2;
+		ctx.lineWidth = 5;
+		ctx.lineCap ="round";
+		ctx.beginPath();
+		ctx.strokeStyle = strokeColour1;
+		
+		//iterate through all links
+		for(var i=0;i<linksLength;i++) {
+		
+		//reset link trackers
+		foundMaster=false;
+		foundRegion=false
+			//get master... links
+			if(links[i].id.indexOf("master")!=-1) {
+				foundMaster = true;
+				regionCode = links[i].id.substring(6,links[i].id.length);
+				//locate start points
+				ctx.moveTo(findPosX(links[i])+xoffset,findPosY(links[i])+yoffset);
+			}
+			
+			//get region... links
+			if(document.getElementById("region"+regionCode)) {
+				foundRegion = true;
+				elementRef=document.getElementById("region"+regionCode);
+				//locate and plot end points
+				lineToX = findPosX(elementRef)+xoffset;
+				lineToY = findPosY(elementRef)+yoffset;
+				ctx.lineTo(lineToX,lineToY);
+			}
+									
+			//colour alternate links on existing links only	
+		 	if (foundMaster && foundRegion) {			
+				existingLinkNo++;
+			}
+			ctx.stroke();
+		}
+		
+      }
+	  
+	  window.onload=drawLines;
+	  
+	//PPK's find element position
+	function findPosX(obj) {
+		var curleft = 0;
+		if (obj.offsetParent)
+		{
+			while (obj.offsetParent)
+			{
+				curleft += obj.offsetLeft
+				obj = obj.offsetParent;
+			}
+		}
+		else if (obj.x)
+			curleft += obj.x;
+		return curleft;
+	}
+	
+	function findPosY(obj) {
+		var curtop = 0;
+		if (obj.offsetParent)
+		{
+			while (obj.offsetParent)
+			{
+				curtop += obj.offsetTop
+				obj = obj.offsetParent;
+			}
+		}
+		else if (obj.y)
+			curtop += obj.y;
+		return curtop;
+	}
+  
+    </script>
+	<style>
+	
+	body {margin: 0;padding: 0;}
+	#area {position:absolute;z-index: 0;top:2px;left: 0;opacity: 0.2;filter: alpha(opacity = 20);}
+	#linklines {}
+	#primary,#secondary {position: relative;z-index:1;}	
+	#primary {float:left;width:300px;}
+	#primary li {list-style-type:circle;}
+	#secondary {float:left;float:left;width:300px;}
+
+	</style>
+</head>
+
+<body>
+<canvas id="area" height="200" width="500"></canvas>
+
+<div id="linklines">
+	<ul id="primary">
+		<li><a href="" id="master1">Region 1</a></li>
+		<li><a href="" id="master2">Region 2</a></li>
+		<li><a href="" id="master3">Region 3</a></li>
+		<li><a href="" id="master4">Region 4</a></li>
+		<li><a href="" id="master5">Region 5</a></li>
+		<li><a href="" id="master6">Region 6</a></li>
+		<li><a href="" id="master7">Region 7</a></li>
+		<li><a href="" id="master8">Region 8</a></li>
+	</ul>
+
+	<ul id="secondary">
+		<li><a href="" id="region1">Region 1</a></li>
+		<li><a href="" id="region2">Region 2</a></li>
+		<li><a href="" id="region4">Region 4</a></li>
+		<li><a href="" id="region5">Region 5</a></li>
+		<li><a href="" id="region7">Region 7</a></li>
+		<li><a href="" id="region8">Region 8</a></li>
+	</ul>
+</div>
+</body>
+</html>
